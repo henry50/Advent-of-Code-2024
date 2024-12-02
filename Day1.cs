@@ -1,11 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AdventOfCode2024
+﻿namespace AdventOfCode2024
 {
     internal class Day1 : Solution
     {
@@ -27,7 +20,7 @@ namespace AdventOfCode2024
             int total = 0;
             for (int i = 0; i < left.Count; i++)
             {
-                total += int.Abs(left[i] - right[i]);
+                total += Math.Abs(left[i] - right[i]);
             }
             return total.ToString();
 

@@ -5,6 +5,7 @@
 
 # AOC input files
 input/
+example/
 
 
 # User-specific files
@@ -365,3 +366,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/example/day1.txt

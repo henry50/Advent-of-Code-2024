@@ -8,7 +8,7 @@ namespace AdventOfCode2024
         {
             int total = 0;
             Regex validMul = new Regex(@"mul\((\d{1,3}),(\d{1,3})\)");
-            foreach( Match match in validMul.Matches(input))
+            foreach (Match match in validMul.Matches(input))
             {
                 total += (int.Parse(match.Groups[1].Value) * int.Parse(match.Groups[2].Value));
             }

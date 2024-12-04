@@ -7,10 +7,10 @@
             // there must be a better way to do this
             string inputDirectory = @"..\..\..\input";
             List<Solution> solutions = [
-                new Day1(),
-                new Day2(),
-                new Day3(),
-                new Day4(),
+                new Day01(),
+                new Day02(),
+                new Day03(),
+                new Day04(),
             ];
             for (int i = 0; i < solutions.Count; i++)
             {

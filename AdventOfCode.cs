@@ -1,4 +1,8 @@
-﻿namespace AdventOfCode2024
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+
+namespace AdventOfCode2024
 {
     public class AdventOfCode
     {
@@ -11,6 +15,7 @@
                 new Day02(),
                 new Day03(),
                 new Day04(),
+                new Day05(),
             ];
             for (int i = 0; i < solutions.Count; i++)
             {

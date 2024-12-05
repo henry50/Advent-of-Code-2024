@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace AdventOfCode2024
 {
     internal class Day04 : Solution

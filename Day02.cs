@@ -1,4 +1,8 @@
-﻿namespace AdventOfCode2024
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace AdventOfCode2024
 {
     internal class Day02 : Solution
     {

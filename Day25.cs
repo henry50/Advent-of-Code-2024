@@ -1,7 +1,7 @@
 ﻿
 namespace AdventOfCode2024
 {
-    internal class DayN : Solution
+    internal class Day25 : Solution
     {
         public override string Part1(string input)
         {

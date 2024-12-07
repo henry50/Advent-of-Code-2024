@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace AdventOfCode2024
 {
@@ -8,26 +8,70 @@ namespace AdventOfCode2024
     {
         public static void Main(string[] args)
         {
+            // create instances of classes implementing Solution
+            Type solutionType = typeof(Solution);
+            Solution[] solutions = solutionType.Assembly.GetTypes()
+                .Where(t => t.IsSubclassOf(solutionType))
+                .OrderBy(t => t.Name)
+                .Select(t => (Solution)Activator.CreateInstance(t)!)
+                .ToArray();
+
+            Console.Write("Enter day to run (1-25) or \"ALL\" (leave blank for current day): ");
+            string? dayOption = Console.ReadLine();
+            switch (dayOption)
+            {
+                case null:
+                    Console.WriteLine("ERROR: ReadLine failed");
+                    break;
+                case "":
+                    int today = DateTime.Today.Day - 1;
+                    RunDay(today, solutions[today]);
+                    break;
+                case "all":
+                case "ALL":
+                    for (int n = 0; n < solutions.Length; n++)
+                    {
+                        RunDay(n, solutions[n]);
+                    }
+                    break;
+                default:
+                    if (int.TryParse(dayOption, out int i))
+                    {
+                        i--; // convert day number to index
+                        if (i >= 0 && i < solutions.Length)
+                        {
+                            RunDay(i, solutions[i]);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Day number out of range");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid input");
+                    }
+                    break;
+            }
+        }
+        public static void RunDay(int n, Solution solution) { 
+            
+            string day = (n + 1).ToString();
+            Console.WriteLine("=== Day " + day + " ===");
             // there must be a better way to do this
             string inputDirectory = @"..\..\..\input";
-            List<Solution> solutions = [
-                new Day01(),
-                new Day02(),
-                new Day03(),
-                new Day04(),
-                new Day05(),
-            ];
-            for (int i = 0; i < solutions.Count; i++)
+            string input;
+            try
             {
-                string day = (i + 1).ToString();
-                Console.WriteLine("=== Day " + day + " ===");
-                string input = File.ReadAllText(Path.Combine(inputDirectory, "day" + day + ".txt"));
-                Solution solution = solutions[i];
-                Console.Write("Part 1: ");
-                Console.WriteLine(solution.Part1(input));
-                Console.Write("Part 2: ");
-                Console.WriteLine(solution.Part2(input));
-            }
+                input = File.ReadAllText(Path.Combine(inputDirectory, "day" + day + ".txt"));
+            } catch (FileNotFoundException){
+                Console.WriteLine("ERROR: Could not find input file for this day");
+                return;
+            } 
+            Console.Write("Part 1: ");
+            Console.WriteLine(solution.Part1(input));
+            Console.Write("Part 2: ");
+            Console.WriteLine(solution.Part2(input));
         }
     }
 }

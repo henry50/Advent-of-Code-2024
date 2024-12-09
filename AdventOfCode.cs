@@ -10,7 +10,8 @@ namespace AdventOfCode2024
         {
             // create instances of classes implementing Solution
             Type solutionType = typeof(Solution);
-            Solution[] solutions = solutionType.Assembly.GetTypes()
+            Solution[] solutions = solutionType
+                .Assembly.GetTypes()
                 .Where(t => t.IsSubclassOf(solutionType))
                 .OrderBy(t => t.Name)
                 .Select(t => (Solution)Activator.CreateInstance(t)!)
@@ -54,8 +55,9 @@ namespace AdventOfCode2024
                     break;
             }
         }
-        public static void RunDay(int n, Solution solution) { 
-            
+
+        public static void RunDay(int n, Solution solution)
+        {
             string day = (n + 1).ToString();
             Console.WriteLine("=== Day " + day + " ===");
             // there must be a better way to do this
@@ -64,10 +66,12 @@ namespace AdventOfCode2024
             try
             {
                 input = File.ReadAllText(Path.Combine(inputDirectory, "day" + day + ".txt"));
-            } catch (FileNotFoundException){
+            }
+            catch (FileNotFoundException)
+            {
                 Console.WriteLine("ERROR: Could not find input file for this day");
                 return;
-            } 
+            }
             Console.Write("Part 1: ");
             Console.WriteLine(solution.Part1(input));
             Console.Write("Part 2: ");

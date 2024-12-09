@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,16 +9,19 @@ namespace AdventOfCode2024
         int part1 = 0;
         int part2 = 0;
         bool solved = false;
+
         public override string Part1(string input)
         {
             Solve(input);
             return part1.ToString();
         }
+
         public override string Part2(string input)
         {
             Solve(input);
             return part2.ToString();
         }
+
         private void Solve(string input)
         {
             if (solved)
@@ -27,15 +29,26 @@ namespace AdventOfCode2024
                 return;
             }
             // parse input
-            string[] parts = input.Split(["\r\n\r\n", "\r\r", "\n\n"], StringSplitOptions.TrimEntries);
-            int[][] rules = parts[0].Split('\n').Select(x => x.Split('|').Select(int.Parse).ToArray()).ToArray();
-            int[][] pagesList = parts[1].Split('\n').Select(x => x.Split(',').Select(int.Parse).ToArray()).ToArray();
+            string[] parts = input.Split(
+                ["\r\n\r\n", "\r\r", "\n\n"],
+                StringSplitOptions.TrimEntries
+            );
+            int[][] rules = parts[0]
+                .Split('\n')
+                .Select(x => x.Split('|').Select(int.Parse).ToArray())
+                .ToArray();
+            int[][] pagesList = parts[1]
+                .Split('\n')
+                .Select(x => x.Split(',').Select(int.Parse).ToArray())
+                .ToArray();
 
             // check each page
             foreach (int[] pages in pagesList)
             {
                 // get only the rules that apply to these pages
-                int[][] relevantRules = rules.Where(x => pages.Contains(x[0]) && pages.Contains(x[1])).ToArray();
+                int[][] relevantRules = rules
+                    .Where(x => pages.Contains(x[0]) && pages.Contains(x[1]))
+                    .ToArray();
                 // sort pages by rules
                 int[] sorted = pages.OrderBy(x => x, new RuleComparer(relevantRules)).ToArray();
                 // get middle page
@@ -53,6 +66,7 @@ namespace AdventOfCode2024
             solved = true;
         }
     }
+
     class RuleComparer(int[][] rules) : IComparer<int>
     {
         public int Compare(int x, int y)

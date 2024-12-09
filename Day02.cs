@@ -17,9 +17,15 @@ namespace AdventOfCode2024
                 for (int i = 0; i < levels.Length - 1; i++)
                 {
                     int diff = Math.Abs(levels[i] - levels[i + 1]);
-                    if (diff < 1 || diff > 3 || (asc && (levels[i] > levels[i + 1])) || (!asc && (levels[i] < levels[i + 1])))
+                    if (
+                        diff < 1
+                        || diff > 3
+                        || (asc && (levels[i] > levels[i + 1]))
+                        || (!asc && (levels[i] < levels[i + 1]))
+                    )
                     {
-                        is_safe = false; break;
+                        is_safe = false;
+                        break;
                     }
                 }
                 if (is_safe)
@@ -28,8 +34,8 @@ namespace AdventOfCode2024
                 }
             }
             return safe.ToString();
-
         }
+
         public override string Part2(string input)
         {
             int safe = 0;
@@ -51,14 +57,21 @@ namespace AdventOfCode2024
                     for (int i = 0; i < dampened.Count - 1; i++)
                     {
                         int diff = Math.Abs(dampened[i] - dampened[i + 1]);
-                        if (diff < 1 || diff > 3 || (asc && (dampened[i] > dampened[i + 1])) || (!asc && (dampened[i] < dampened[i + 1])))
+                        if (
+                            diff < 1
+                            || diff > 3
+                            || (asc && (dampened[i] > dampened[i + 1]))
+                            || (!asc && (dampened[i] < dampened[i + 1]))
+                        )
                         {
-                            is_safe = false; break;
+                            is_safe = false;
+                            break;
                         }
                     }
                     if (is_safe)
                     {
-                        safe++; break;
+                        safe++;
+                        break;
                     }
                 }
             }

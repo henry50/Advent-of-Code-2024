@@ -11,6 +11,7 @@ namespace AdventOfCode2024
             var (initPosition, obstacles) = Parse(input);
             return Solve(initPosition, obstacles, false).ToString();
         }
+
         public override string Part2(string input)
         {
             int total = 0;
@@ -31,19 +32,23 @@ namespace AdventOfCode2024
             }
             return total.ToString();
         }
+
         private int Solve((int row, int col) initPosition, bool[][] obstacles, bool checkLoop)
         {
             (int row, int col) position = initPosition;
             (int row, int col) nextPosition;
             HashSet<(int, int)> visited = [initPosition];
-            HashSet<(int, int, int, int)> directedVisited = [(initPosition.row, initPosition.col, -1, 0)];
+            HashSet<(int, int, int, int)> directedVisited =
+            [
+                (initPosition.row, initPosition.col, -1, 0),
+            ];
             (int row, int col) facing = (-1, 0); // up
             while (true)
             {
                 // go forward as long as possible
                 nextPosition = (position.row + facing.row, position.col + facing.col);
                 // left the map?
-                if (!inMapRange(nextPosition, obstacles))
+                if (!InMapRange(nextPosition, obstacles))
                 {
                     break;
                 }
@@ -57,7 +62,7 @@ namespace AdventOfCode2024
                         (0, 1) => (1, 0), // right -> down
                         (1, 0) => (0, -1), // down -> left
                         (0, -1) => (-1, 0), // left -> up
-                        _ => throw new NotImplementedException()
+                        _ => throw new NotImplementedException(),
                     };
                 }
                 // keep going forward
@@ -86,13 +91,21 @@ namespace AdventOfCode2024
             }
             return visited.Count;
         }
-        private bool inMapRange((int row, int col) position, bool[][] map)
+
+        private bool InMapRange((int row, int col) position, bool[][] map)
         {
-            return position.row >= 0 && position.row < map.Length && position.col >= 0 && position.col < map[0].Length;
+            return position.row >= 0
+                && position.row < map.Length
+                && position.col >= 0
+                && position.col < map[0].Length;
         }
+
         private ((int row, int col), bool[][]) Parse(string input)
         {
-            string[] split = input.Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            string[] split = input.Split(
+                '\n',
+                StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
+            );
             (int, int) initPosition = (-1, -1);
             for (int r = 0; r < split.Length; r++)
             {
@@ -112,6 +125,5 @@ namespace AdventOfCode2024
             bool[][] obstacles = split.Select(x => x.Select(y => y == '#').ToArray()).ToArray();
             return (initPosition, obstacles);
         }
-
     }
 }

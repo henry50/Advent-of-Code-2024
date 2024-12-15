@@ -24,13 +24,13 @@ namespace AdventOfCode2024
                 // odd index - free space
                 else
                 {
-                    // if end is less than i all remaining space is empty
-                    if (end < i)
-                    {
-                        return total.ToString();
-                    }
                     for (int j = 0; j < blocks[i]; j++)
                     {
+                        // if end is less than i all remaining space is empty
+                        if (end < i)
+                        {
+                            return total.ToString();
+                        }
                         // get the file id of the rightmost file
                         int fileId = end / 2;
                         // add it to the total

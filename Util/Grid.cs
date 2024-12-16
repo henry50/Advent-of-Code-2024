@@ -67,6 +67,7 @@ namespace AdventOfCode2024.Util
                     }
                 }
             }
+            yield break;
         }
 
         public override string ToString()

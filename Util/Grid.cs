@@ -6,10 +6,10 @@ namespace AdventOfCode2024.Util
 {
     internal class Grid<T>
     {
-        private char[][] CharCells { get; }
-        public GridCell<T>[][] Cells { get; }
-        private int Rowmax { get; }
-        private int Colmax { get; }
+        private readonly char[][] charCells;
+        private readonly GridCell<T>[][] cells;
+        private readonly int rowmax;
+        private readonly int colmax;
 
         public Grid(string grid, Func<char, T> parser)
         {
@@ -17,10 +17,10 @@ namespace AdventOfCode2024.Util
                 '\n',
                 StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
             );
-            Rowmax = rows.Length;
-            Colmax = rows[0].Length;
-            CharCells = rows.Select(x => x.ToCharArray()).ToArray();
-            Cells = CharCells
+            rowmax = rows.Length;
+            colmax = rows[0].Length;
+            charCells = rows.Select(x => x.ToCharArray()).ToArray();
+            cells = charCells
                 .Select(
                     (x, r) => x.Select((y, c) => new GridCell<T>(this, r, c, parser(y))).ToArray()
                 )
@@ -32,7 +32,7 @@ namespace AdventOfCode2024.Util
 
         public bool InGridRange(int row, int col)
         {
-            return row >= 0 && row < Rowmax && col >= 0 && col < Colmax;
+            return row >= 0 && row < rowmax && col >= 0 && col < colmax;
         }
 
         public bool InGridRange((int row, int col) loc)
@@ -40,15 +40,29 @@ namespace AdventOfCode2024.Util
             return InGridRange(loc.row, loc.col);
         }
 
+        public GridCell<T>? Get(int row, int col)
+        {
+            if (InGridRange(row, col))
+            {
+                return cells[row][col];
+            }
+            return null;
+        }
+
+        public GridCell<T>? Get((int row, int col) loc)
+        {
+            return Get(loc.row, loc.col);
+        }
+
         public GridCell<T>? Find(T value)
         {
-            for (int r = 0; r < Rowmax; r++)
+            for (int r = 0; r < rowmax; r++)
             {
-                for (int c = 0; c < Colmax; c++)
+                for (int c = 0; c < colmax; c++)
                 {
-                    if (Cells[r][c].Value!.Equals(value))
+                    if (cells[r][c].Value!.Equals(value))
                     {
-                        return Cells[r][c];
+                        return cells[r][c];
                     }
                 }
             }
@@ -57,13 +71,13 @@ namespace AdventOfCode2024.Util
 
         public IEnumerable<GridCell<T>> FindAll(T value)
         {
-            for (int r = 0; r < Rowmax; r++)
+            for (int r = 0; r < rowmax; r++)
             {
-                for (int c = 0; c < Colmax; c++)
+                for (int c = 0; c < colmax; c++)
                 {
-                    if (Cells[r][c].Value!.Equals(value))
+                    if (cells[r][c].Value!.Equals(value))
                     {
-                        yield return Cells[r][c];
+                        yield return cells[r][c];
                     }
                 }
             }
@@ -74,7 +88,7 @@ namespace AdventOfCode2024.Util
         {
             return string.Join(
                 '\n',
-                Cells.Select(x => string.Join(" | ", x.Select(y => y.ToString())))
+                cells.Select(x => string.Join(" | ", x.Select(y => y.ToString())))
             );
         }
     }
@@ -97,7 +111,7 @@ namespace AdventOfCode2024.Util
                     )
                     {
                         // InGridRange check ensures non-null
-                        yield return grid.Cells[Row + i][Col + j];
+                        yield return grid.Get(Row + i, Col + j)!;
                     }
                 }
             }

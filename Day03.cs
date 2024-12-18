@@ -2,9 +2,11 @@
 
 namespace AdventOfCode2024
 {
-    internal class Day03 : Solution
+    internal class Day03(string input) : Solution(input)
     {
-        public override string Part1(string input)
+        readonly string input = input;
+
+        public override string Part1()
         {
             int total = 0;
             Regex validMul = new Regex(@"mul\((\d{1,3}),(\d{1,3})\)");
@@ -14,7 +16,8 @@ namespace AdventOfCode2024
             }
             return total.ToString();
         }
-        public override string Part2(string input)
+
+        public override string Part2()
         {
             int total = 0;
             bool ignore = false;
@@ -36,7 +39,5 @@ namespace AdventOfCode2024
             }
             return total.ToString();
         }
-
     }
 }
-

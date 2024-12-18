@@ -6,16 +6,43 @@ namespace AdventOfCode2024
 {
     internal class Day06 : Solution
     {
-        public override string Part1(string input)
+        (int row, int col) initPosition;
+        readonly bool[][] obstacles;
+
+        public Day06(string input)
+            : base(input)
         {
-            var (initPosition, obstacles) = Parse(input);
-            return Solve(initPosition, obstacles, false).ToString();
+            string[] split = input.Split(
+                '\n',
+                StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
+            );
+            initPosition = (-1, -1);
+            for (int r = 0; r < split.Length; r++)
+            {
+                for (int c = 0; c < split[r].Length; c++)
+                {
+                    if (split[r][c] == '^')
+                    {
+                        initPosition = (r, c);
+                        break;
+                    }
+                }
+            }
+            if (initPosition == (-1, -1))
+            {
+                throw new Exception("^ does not appear in input file");
+            }
+            obstacles = split.Select(x => x.Select(y => y == '#').ToArray()).ToArray();
         }
 
-        public override string Part2(string input)
+        public override string Part1()
+        {
+            return Solve(false).ToString();
+        }
+
+        public override string Part2()
         {
             int total = 0;
-            var (initPosition, obstacles) = Parse(input);
             // try adding an obstacle everywhere
             for (int r = 0; r < obstacles.Length; r++)
             {
@@ -25,7 +52,7 @@ namespace AdventOfCode2024
                     if (!obstacles[r][c] && !(r == initPosition.row && c == initPosition.col))
                     {
                         obstacles[r][c] = true;
-                        total += Solve(initPosition, obstacles, true);
+                        total += Solve(true);
                         obstacles[r][c] = false;
                     }
                 }
@@ -33,7 +60,7 @@ namespace AdventOfCode2024
             return total.ToString();
         }
 
-        private int Solve((int row, int col) initPosition, bool[][] obstacles, bool checkLoop)
+        private int Solve(bool checkLoop)
         {
             (int row, int col) position = initPosition;
             (int row, int col) nextPosition;
@@ -98,32 +125,6 @@ namespace AdventOfCode2024
                 && position.row < map.Length
                 && position.col >= 0
                 && position.col < map[0].Length;
-        }
-
-        private ((int row, int col), bool[][]) Parse(string input)
-        {
-            string[] split = input.Split(
-                '\n',
-                StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
-            );
-            (int, int) initPosition = (-1, -1);
-            for (int r = 0; r < split.Length; r++)
-            {
-                for (int c = 0; c < split[r].Length; c++)
-                {
-                    if (split[r][c] == '^')
-                    {
-                        initPosition = (r, c);
-                        break;
-                    }
-                }
-            }
-            if (initPosition == (-1, -1))
-            {
-                throw new Exception("^ does not appear in input file");
-            }
-            bool[][] obstacles = split.Select(x => x.Select(y => y == '#').ToArray()).ToArray();
-            return (initPosition, obstacles);
         }
     }
 }

@@ -5,22 +5,23 @@ using AdventOfCode2024.Util;
 
 namespace AdventOfCode2024
 {
-    internal class Day10 : Solution
+    internal class Day10(string input) : Solution(input)
     {
-        public override string Part1(string input)
+        readonly Grid<int> grid = new(input, c => (int)char.GetNumericValue(c));
+
+        public override string Part1()
         {
-            return Solve(input, false);
+            return Solve(false);
         }
 
-        public override string Part2(string input)
+        public override string Part2()
         {
-            return Solve(input, true);
+            return Solve(true);
         }
 
-        private static string Solve(string input, bool distinctPaths)
+        private string Solve(bool distinctPaths)
         {
             int trails = 0;
-            Grid<int> grid = new(input, c => (int)char.GetNumericValue(c));
             var trailheads = grid.FindAll(0);
             foreach (GridCell<int> trailhead in trailheads)
             {

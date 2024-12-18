@@ -4,9 +4,11 @@ using System.Linq;
 
 namespace AdventOfCode2024
 {
-    internal class Day02 : Solution
+    internal class Day02(string input) : Solution(input)
     {
-        public override string Part1(string input)
+        readonly string input = input;
+
+        public override string Part1()
         {
             int safe = 0;
             foreach (var line in input.Split('\n'))
@@ -36,7 +38,7 @@ namespace AdventOfCode2024
             return safe.ToString();
         }
 
-        public override string Part2(string input)
+        public override string Part2()
         {
             int safe = 0;
             foreach (var line in input.Split('\n'))

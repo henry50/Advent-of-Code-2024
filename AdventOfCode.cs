@@ -1,67 +1,91 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode2024
 {
     public class AdventOfCode
     {
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
-            // create instances of classes implementing Solution
+            // get classes implementing Solution
             Type solutionType = typeof(Solution);
-            Solution[] solutions = solutionType
+            Type[] solutionTypes = solutionType
                 .Assembly.GetTypes()
                 .Where(t => t.IsSubclassOf(solutionType))
                 .OrderBy(t => t.Name)
-                .Select(t => (Solution)Activator.CreateInstance(t)!)
                 .ToArray();
-
-            Console.Write("Enter day to run (1-25) or \"ALL\" (leave blank for current day): ");
-            string? dayOption = Console.ReadLine();
-            switch (dayOption)
+            int solutionCount = solutionTypes.Length;
+            // check solutions exist
+            if (solutionCount == 0)
             {
-                case null:
-                    Console.WriteLine("ERROR: ReadLine failed");
-                    break;
-                case "":
-                    int today = DateTime.Today.Day - 1;
-                    RunDay(today, solutions[today]);
-                    break;
-                case "all":
-                case "ALL":
-                    for (int n = 0; n < solutions.Length; n++)
+                Console.Error.WriteLine(
+                    "ERROR: Couldn't find any classes that implement Solution, exiting..."
+                );
+                return 1;
+            }
+            // ask which days to run
+            IEnumerable<int> daysToRun = [];
+            bool useExample;
+            while (true)
+            {
+                Console.Write(
+                    $"Enter day to run (1-{solutionCount}) or \"ALL\" (leave blank for current day, append \"!\" to use example input): "
+                );
+                string? input = Console.ReadLine();
+                if (input == null)
+                {
+                    Console.Error.WriteLine("ERROR: ReadLine failed");
+                    return 1;
+                }
+                // validate input
+                Regex validInput = new Regex(@"^(\d+|all)?(!?)$", RegexOptions.IgnoreCase);
+                Match match = validInput.Match(input);
+                if (match.Success)
+                {
+                    useExample = match.Groups[2].Value == "!";
+                    string dayChoice = match.Groups[1].Value;
+                    if (dayChoice == "all")
                     {
-                        RunDay(n, solutions[n]);
+                        daysToRun = Enumerable.Range(0, solutionCount);
+                        break;
                     }
-                    break;
-                default:
-                    if (int.TryParse(dayOption, out int i))
+                    // try and parse the number, failing that use today's date
+                    int tryDay = int.TryParse(dayChoice, out tryDay) ? tryDay : DateTime.Today.Day;
+                    // check the value is in range
+                    if (tryDay > 0 && tryDay <= solutionCount)
                     {
-                        i--; // convert day number to index
-                        if (i >= 0 && i < solutions.Length)
-                        {
-                            RunDay(i, solutions[i]);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Day number out of range");
-                        }
+                        daysToRun = [tryDay - 1];
+                        break;
                     }
                     else
                     {
-                        Console.WriteLine("Invalid input");
+                        Console.Error.WriteLine("ERROR: Selected day not in range");
                     }
-                    break;
+                }
+                else
+                {
+                    Console.Error.WriteLine("ERROR: Invalid input");
+                }
             }
+            // run selected solution
+            foreach (int day in daysToRun)
+            {
+                RunDay(day, solutionTypes[day], useExample);
+            }
+            return 0;
         }
 
-        public static void RunDay(int n, Solution solution)
+        public static void RunDay(int n, Type solutionType, bool example)
         {
             string day = (n + 1).ToString();
             Console.WriteLine("=== Day " + day + " ===");
-            // there must be a better way to do this
-            string inputDirectory = @"..\..\..\input";
+            string inputDirectory = Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                example ? "example" : "input"
+            );
             string input;
             try
             {
@@ -69,13 +93,14 @@ namespace AdventOfCode2024
             }
             catch (FileNotFoundException)
             {
-                Console.WriteLine("ERROR: Could not find input file for this day");
+                Console.Error.WriteLine("ERROR: Could not find input file for this day");
                 return;
             }
+            Solution solution = (Solution)Activator.CreateInstance(solutionType, input)!;
             Console.Write("Part 1: ");
-            Console.WriteLine(solution.Part1(input));
+            Console.WriteLine(solution.Part1());
             Console.Write("Part 2: ");
-            Console.WriteLine(solution.Part2(input));
+            Console.WriteLine(solution.Part2());
         }
     }
 }

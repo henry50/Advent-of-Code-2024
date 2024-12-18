@@ -6,29 +6,39 @@ namespace AdventOfCode2024
 {
     internal class Day08 : Solution
     {
-        Dictionary<char, (int y, int x)[]> freqAntennae = [];
+        readonly Dictionary<char, (int y, int x)[]> freqAntennae = [];
+        readonly int maxX;
+        readonly int maxY;
 
-        int maxX;
-        int maxY;
-        bool parsed = false;
-
-        public override string Part1(string input)
+        public Day08(string input)
+            : base(input)
         {
-            return Solve(input, false);
+            string[] split = input.Split(
+                '\n',
+                StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
+            );
+            // mapping of frequency -> array of antenna positions
+            freqAntennae = split
+                .SelectMany((s, r) => s.Select((i, c) => (i, pos: (r, c)))) // convert grid to (char, (row, column))
+                .GroupBy(x => x.i, x => x.pos) // group by char
+                .Where(x => x.Key != '.') // remove empty spaces
+                .ToDictionary(x => x.Key, x => x.ToArray()); // convert to dictionary
+            maxX = split.Length;
+            maxY = split[0].Length;
         }
 
-        public override string Part2(string input)
+        public override string Part1()
         {
-            return Solve(input, true);
+            return Solve(false);
         }
 
-        private string Solve(string input, bool resonantHarmonics)
+        public override string Part2()
         {
-            if (!parsed)
-            {
-                Parse(input);
-            }
+            return Solve(true);
+        }
 
+        private string Solve(bool resonantHarmonics)
+        {
             bool InMapRange((int x, int y) p) => (p.x >= 0 && p.x < maxX && p.y >= 0 && p.y < maxY);
 
             HashSet<(int, int)> antinodes = [];
@@ -76,23 +86,6 @@ namespace AdventOfCode2024
                 }
             }
             return antinodes.Count.ToString();
-        }
-
-        private void Parse(string input)
-        {
-            string[] split = input.Split(
-                '\n',
-                StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
-            );
-            // mapping of frequency -> array of antenna positions
-            freqAntennae = split
-                .SelectMany((s, r) => s.Select((i, c) => (i, pos: (r, c)))) // convert grid to (char, (row, column))
-                .GroupBy(x => x.i, x => x.pos) // group by char
-                .Where(x => x.Key != '.') // remove empty spaces
-                .ToDictionary(x => x.Key, x => x.ToArray()); // convert to dictionary
-            maxX = split.Length;
-            maxY = split[0].Length;
-            parsed = true;
         }
     }
 }

@@ -6,13 +6,27 @@ namespace AdventOfCode2024
 {
     internal class Day07 : Solution
     {
-        public override string Part1(string input)
+        readonly (long target, long[] numbers)[] equations;
+
+        public Day07(string input)
+            : base(input)
         {
-            Func<long, long, long>[] operators = [(x, y) => x + y, (x, y) => x * y];
-            return Solve(input, operators);
+            equations = input
+                .Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Split(": "))
+                .Select(x =>
+                    (long.Parse(x[0]), x[1].Split(' ').Select(y => long.Parse(y)).ToArray())
+                )
+                .ToArray();
         }
 
-        public override string Part2(string input)
+        public override string Part1()
+        {
+            Func<long, long, long>[] operators = [(x, y) => x + y, (x, y) => x * y];
+            return Solve(operators);
+        }
+
+        public override string Part2()
         {
             Func<long, long, long>[] operators =
             [
@@ -20,12 +34,11 @@ namespace AdventOfCode2024
                 (x, y) => x * y,
                 (x, y) => long.Parse(x.ToString() + y.ToString()),
             ];
-            return Solve(input, operators);
+            return Solve(operators);
         }
 
-        private string Solve(string input, Func<long, long, long>[] operators)
+        private string Solve(Func<long, long, long>[] operators)
         {
-            var equations = Parse(input);
             long possiblyTrue = 0;
             foreach (var (target, numbers) in equations)
             {
@@ -49,17 +62,6 @@ namespace AdventOfCode2024
                 }
             }
             return possiblyTrue.ToString();
-        }
-
-        private (long target, long[] numbers)[] Parse(string input)
-        {
-            return input
-                .Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => x.Split(": "))
-                .Select(x =>
-                    (long.Parse(x[0]), x[1].Split(' ').Select(y => long.Parse(y)).ToArray())
-                )
-                .ToArray();
         }
     }
 }

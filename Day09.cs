@@ -2,9 +2,11 @@
 
 namespace AdventOfCode2024
 {
-    internal class Day09 : Solution
+    internal class Day09(string input) : Solution(input)
     {
-        public override string Part1(string input)
+        readonly string input = input;
+
+        public override string Part1()
         {
             int[] blocks = input.TrimEnd().Select(c => c - '0').ToArray();
             long total = 0;
@@ -49,7 +51,7 @@ namespace AdventOfCode2024
             return total.ToString();
         }
 
-        public override string Part2(string input)
+        public override string Part2()
         {
             int[] blocks = input.TrimEnd().Select(c => c - '0').ToArray();
             long total = 0;

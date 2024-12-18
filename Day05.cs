@@ -6,41 +6,47 @@ namespace AdventOfCode2024
 {
     internal class Day05 : Solution
     {
+        readonly int[][] rules;
+        readonly int[][] pagesList;
         int part1 = 0;
         int part2 = 0;
         bool solved = false;
 
-        public override string Part1(string input)
+        public Day05(string input)
+            : base(input)
         {
-            Solve(input);
+            string[] parts = input.Split(
+                ["\r\n\r\n", "\r\r", "\n\n"],
+                StringSplitOptions.TrimEntries
+            );
+            rules = parts[0]
+                .Split('\n')
+                .Select(x => x.Split('|').Select(int.Parse).ToArray())
+                .ToArray();
+            pagesList = parts[1]
+                .Split('\n')
+                .Select(x => x.Split(',').Select(int.Parse).ToArray())
+                .ToArray();
+        }
+
+        public override string Part1()
+        {
+            Solve();
             return part1.ToString();
         }
 
-        public override string Part2(string input)
+        public override string Part2()
         {
-            Solve(input);
+            Solve();
             return part2.ToString();
         }
 
-        private void Solve(string input)
+        private void Solve()
         {
             if (solved)
             {
                 return;
             }
-            // parse input
-            string[] parts = input.Split(
-                ["\r\n\r\n", "\r\r", "\n\n"],
-                StringSplitOptions.TrimEntries
-            );
-            int[][] rules = parts[0]
-                .Split('\n')
-                .Select(x => x.Split('|').Select(int.Parse).ToArray())
-                .ToArray();
-            int[][] pagesList = parts[1]
-                .Split('\n')
-                .Select(x => x.Split(',').Select(int.Parse).ToArray())
-                .ToArray();
 
             // check each page
             foreach (int[] pages in pagesList)

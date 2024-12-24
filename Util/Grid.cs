@@ -54,6 +54,11 @@ namespace AdventOfCode2024.Util
             return Get(loc.row, loc.col);
         }
 
+        public IEnumerable<GridCell<T>> GetAll()
+        {
+            return cells.SelectMany(x => x);
+        }
+
         public GridCell<T>? Find(T value)
         {
             for (int r = 0; r < rowmax; r++)
@@ -84,6 +89,13 @@ namespace AdventOfCode2024.Util
             yield break;
         }
 
+        public IEnumerable<(int row, int col)> GetCoords()
+        {
+            return Enumerable
+                .Range(0, rowmax)
+                .SelectMany(r => Enumerable.Range(0, colmax).Select(c => (r, c)));
+        }
+
         public override string ToString()
         {
             return string.Join(
@@ -100,14 +112,19 @@ namespace AdventOfCode2024.Util
         public int Col { get; } = col;
         public T Value { get; } = value;
 
-        public IEnumerable<GridCell<T>> GetNeighbours(bool includeDiagonals)
+        public IEnumerable<GridCell<T>> GetNeighbours(
+            bool includeDiagonals,
+            bool includeNull = false
+        )
         {
             for (int i = -1; i <= 1; i++)
             {
                 for (int j = -1; j <= 1; j++)
                 {
                     if (
-                        grid.InGridRange(Row + i, Col + j) && (i == 0 || j == 0 || includeDiagonals)
+                        (includeNull || grid.InGridRange(Row + i, Col + j))
+                        && (i == 0 || j == 0 || includeDiagonals)
+                        && !(i == 0 && j == 0)
                     )
                     {
                         // InGridRange check ensures non-null

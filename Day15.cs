@@ -112,18 +112,8 @@ namespace AdventOfCode2024
                 {
                     // hit a box, try to move it and any adjacent to it
 
-                    // mapping of new value to coordinates
-                    // TODO: replace this with single list, move ] based on [
-                    Dictionary<char, List<Coordinate>> move = [];
-                    if (wide)
-                    {
-                        move.Add('[', []);
-                        move.Add(']', []);
-                    }
-                    else
-                    {
-                        move.Add('O', []);
-                    }
+                    // cells to move
+                    List<Coordinate> move = [];
                     // cells to check in front of this round
                     HashSet<Coordinate> thisFrontier = [currentLoc];
                     // cells to check in front of next round
@@ -136,54 +126,45 @@ namespace AdventOfCode2024
                     {
                         // we assume there is all space ahead until proven otherwise
                         spaceAhead = true;
-                        // get the next frontier
+                        // find the next frontier
                         foreach (var coord in thisFrontier)
                         {
                             var nextNext = NextCell(warehouse, movement, coord);
                             var nextValue = nextNext.Value;
                             var nextLoc = nextNext.Loc;
-                            // more boxes :/
-                            if (nextValue == 'O' || nextValue == '[' || nextValue == ']')
+                            switch (nextValue)
                             {
-                                spaceAhead = false;
-                                move[nextValue].Add(nextLoc);
-                                // always include non-wide boxes in the next frontier
-                                if (nextValue == 'O')
-                                {
+                                case 'O':
+                                    spaceAhead = false;
+                                    move.Add(nextLoc);
                                     nextFrontier.Add(nextLoc);
-                                }
-                                // consider right half of box
-                                else if (nextValue == '[')
-                                {
+                                    break;
+                                case '[':
+                                    spaceAhead = false;
                                     // when travelling right, don't include the left side of the box in the frontier
                                     if (movement != Direction.Right)
                                     {
                                         nextFrontier.Add(nextLoc);
                                     }
-                                    var rightNeighbour = new Coordinate(
-                                        nextLoc.row,
-                                        nextLoc.col + 1
-                                    );
-                                    nextFrontier.Add(rightNeighbour);
-                                    move[']'].Add(rightNeighbour);
-                                }
-                                // consider left half of box
-                                else if (nextValue == ']')
-                                {
+                                    var rightHalf = new Coordinate(nextLoc.row, nextLoc.col + 1);
+                                    nextFrontier.Add(rightHalf);
+                                    move.Add(nextLoc);
+                                    break;
+                                case ']':
+                                    spaceAhead = false;
                                     // when travelling left, don't include the right side of the box in the frontier
                                     if (movement != Direction.Left)
                                     {
                                         nextFrontier.Add(nextLoc);
                                     }
-                                    var leftNeigbour = new Coordinate(nextLoc.row, nextLoc.col - 1);
-                                    nextFrontier.Add(leftNeigbour);
-                                    move['['].Add(leftNeigbour);
-                                }
-                            }
-                            else if (nextValue == '#')
-                            {
-                                spaceAhead = false;
-                                wallHit = true;
+                                    var leftHalf = new Coordinate(nextLoc.row, nextLoc.col - 1);
+                                    nextFrontier.Add(leftHalf);
+                                    move.Add(leftHalf);
+                                    break;
+                                case '#':
+                                    spaceAhead = false;
+                                    wallHit = true;
+                                    break;
                             }
                         }
                         // shift frontiers
@@ -193,23 +174,30 @@ namespace AdventOfCode2024
                     // move the boxes!
                     if (spaceAhead)
                     {
+                        // move robot forward
                         currentLoc = nextCell.Loc;
                         // clear old cells
-                        foreach (var (_, boxes) in move)
+                        move.ForEach(box =>
                         {
-                            boxes.ForEach(box =>
+                            warehouse.Set(box, '.');
+                            if (wide)
                             {
-                                warehouse.Set(box, '.');
-                            });
-                        }
+                                // clear the other half of the box as well
+                                warehouse.Set(box.row, box.col + 1, '.');
+                            }
+                        });
+
                         // write new ones
-                        foreach (var (value, boxes) in move)
+                        move.ForEach(box =>
                         {
-                            boxes.ForEach(box =>
+                            var next = NextCell(warehouse, movement, box);
+                            next.Value = wide ? '[' : 'O';
+                            if (wide)
                             {
-                                NextCell(warehouse, movement, box).Value = value;
-                            });
-                        }
+                                // add the other half
+                                warehouse.Set(next.Row, next.Col + 1, ']');
+                            }
+                        });
                     }
                 }
             }
@@ -222,3 +210,48 @@ namespace AdventOfCode2024
         }
     }
 }
+
+/* Original part 1 implementation
+
+var currentLoc = initLoc.Clone();
+foreach (Direction movement in movements)
+{
+    var nextCell = NextCell(warehouse, movement, currentLoc);
+    if (nextCell == null || nextCell.Value == '#')
+    {
+        continue;
+    }
+    if (nextCell.Value == '.')
+    {
+        currentLoc = nextCell.Loc;
+    }
+    else if (nextCell.Value == 'O')
+    {
+        // check if boxes can be pushed
+        bool canMove = false;
+        List<Coordinate> newLocs = [];
+        GridCell<char>? cell = nextCell;
+        while (!canMove)
+        {
+            cell = NextCell(warehouse, movement, cell.Loc);
+            // give up if a wall is encountered
+            if (cell == null || cell.Value == '#')
+                break;
+            // store the location for pushing into
+            newLocs.Add(cell.Loc);
+            // when a free space is found, the boxes can be moved
+            canMove = cell.Value == '.';
+        }
+        // number of boxes = number of spaces, boxes can be pushed
+        if (canMove)
+        {
+            // move robot forward
+            currentLoc = nextCell.Loc;
+            // replace robot's new position with empty space
+            nextCell.Value = '.';
+            // shift boxes
+            newLocs.ForEach(loc => warehouse.Set(loc, 'O'));
+        }
+    }
+}
+*/

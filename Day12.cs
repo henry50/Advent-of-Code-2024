@@ -21,7 +21,7 @@ namespace AdventOfCode2024
         private string Solve(bool bulkDiscount)
         {
             int total = 0;
-            HashSet<GridCell<char>> unexplored = new(grid.GetAll());
+            HashSet<GridCell<char>> unexplored = new(grid.GetFlattened());
             while (unexplored.Count > 0)
             {
                 // find the region for the first unexplored grid item
@@ -36,7 +36,7 @@ namespace AdventOfCode2024
                 {
                     var current = frontier.Dequeue();
                     var neighbours = current.GetNeighbours(false, true);
-                    int thisPerimeter = 0;
+                    int perimeter = 0;
 
                     // explore neighbours
                     foreach (var neighbour in neighbours)
@@ -55,14 +55,14 @@ namespace AdventOfCode2024
                         else
                         {
                             // any out-of-region neighbours increase this cell's perimeter
-                            thisPerimeter++;
+                            perimeter++;
                         }
                     }
                     // calculate sides
                     if (bulkDiscount)
                     {
                         // single cell surrounded by other regions, 4 sides
-                        if (thisPerimeter == 4)
+                        if (perimeter == 4)
                         {
                             regionOutside = 4;
                         }
@@ -72,7 +72,7 @@ namespace AdventOfCode2024
                          * --+
                          * 1 full side and 2 half sides = 2 sides
                          */
-                        else if (thisPerimeter == 3)
+                        else if (perimeter == 3)
                         {
                             regionOutside += 2;
                         }
@@ -114,7 +114,7 @@ namespace AdventOfCode2024
                     // calculate perimeter
                     else
                     {
-                        regionOutside += thisPerimeter;
+                        regionOutside += perimeter;
                     }
                     // this cell has now been explored
                     unexplored.Remove(current);
@@ -127,8 +127,11 @@ namespace AdventOfCode2024
 
         private bool InRegion(int row, int col, char region)
         {
-            var cell = grid.Get(row, col);
-            return cell != null && cell.Value == region;
+            if (grid.TryGetValue(row, col, out char value))
+            {
+                return value == region;
+            }
+            return false;
         }
     }
 }
